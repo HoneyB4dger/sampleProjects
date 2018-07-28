@@ -1,0 +1,60 @@
+{
+  "name": "stansa-app",
+  "version": "0.0.1",
+  "description": "A local client for pulling and commiting to Stansa repository (macOS/win32)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "keywords": [
+    "Electron",
+    "macOS",
+    "win32",
+    "repository"
+  ],
+  "author": "stansa",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "1.6.6",
+    "electron-builder": "17.1.2"
+  },
+  "build": {
+    "appId": "stansa.stansa-app",
+    "protocols": {
+      "name": "stansa-app",
+      "schemes": [
+        "stansa"
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.Reference",
+      "icon": "logo_stansa_o"
+    },
+    "win": {
+      "icon": "logo_stansa_o"
+    },
+    "extraFiles": [
+      {
+        "from": "resources",
+        "to": "Resources/bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "app-root-dir": "^1.0.2",
+    "fs-jetpack": "^1.2.0",
+    "nodejs-svn": "1.1.2",
+    "os-homedir": "^1.0.2",
+    "path": "^0.12.7",
+    "remote": "^0.2.6",
+    "request": "^2.83.0",
+    "shelljs": "^0.8.0",
+    "svn": "0.3.0",
+    "svn-spawn": "0.1.5"
+  }
+}
