@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="vis.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <link href="vis.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        
+        html {
+            font-family:Helvetica;
+        }
+        
+        #mynetwork {
+            width: 1100px;
+            height: 600px;
+            border: 1px solid lightgray;
+        }
+        
+        .KPI_buttons span {
+            font-size: 13px;
+            padding: 4px;
+            background-color: gainsboro;
+        }
+        
+        .KPI_buttons span:hover {
+            background-color: lightgrey;
+            cursor: pointer;
+        }
+        
+        .active {
+            background-color: darkgrey! important;
+        }
+        
+        .tags span {
+            opacity: 0.7;
+        }        
+        
+        .active2 {
+            opacity: 1 !important;
+        }
+        
+        
+    </style>
+
+</head>
+<body>
+
+<div class="KPI_buttons tags">
+    <span onclick="tagClick('#9ad4f7', this)" class="active2"  style="background-color: #9ad4f7;">Master Agreement</span>
+    <span onclick="tagClick('#b0ccdd', this)" class="active2"  style="background-color: #b0ccdd;">Credit Support Annex</span>
+    <span onclick="tagClick('#e1eaef', this)" class="active2"  style="background-color: #e1eaef;">Ammendment</span>
+    </div>       
+    
+<div style="float: left" id="mynetwork"></div>
+      
+
+<div style="float: right">
+<br>
+    <span id="labelText"></span>
+    </div>     
+    
+<div style="float: left" class="KPI_buttons"> 
+    <span onclick="kpiClick(7, this)" class="active"><b style="color:#dbe8a3">&#9646;</b> Party A</span>
+    <span onclick="kpiClick(8, this)" class="active"><b style="color:#efda6b">&#9646;</b> Party B</span>
+    <span onclick="kpiClick(1, this)" ><b style="color:#b0ddb0">&#9646;</b> Party A MultiBranch?</span>
+    <span onclick="kpiClick(2, this)" ><b style="color:#85dd85">&#9646;</b> Party B MultiBranch?</span>
+    <span onclick="kpiClick(5, this)" ><b style="color:#e4b6ea">&#9646;</b> Base Currency</span>
+    <span onclick="kpiClick(6, this)" ><b style="color:#e098ea">&#9646;</b> Eligible Currency</span>
+    <span onclick="kpiClick(3, this)" ><b style="color:#e6b1b1">&#9646;</b> Governing Law</span>
+    <span onclick="kpiClick(4, this)" ><b style="color:#c3c3c3">&#9646;</b> Credit Support Default</span>
+    <span onclick="kpiClick(9, this)" ><b style="color:#9ce0bb">&#9646;</b> Negative Interest?</span>
+    
+    </div> 
+    
+
+    <br><br><br>
+<div style="float: left">
+    <h1>Guide
+    </h1>
+    <p>
+    > blue/ish nodes are documents <br>
+    > multicolor nodes are KPIs <br>
+    > tags are on top of the area, KPIs are at the bottom - click to show/hide <br>
+    > drag a node anywhere to "lock" it <br>
+    > "locked" nodes don't dissapear after disselecting tag/KPI <br>
+    > to "unlock" a node, click on it again <br>    
+    </p>
+    
+    </div> 
+    
+<script type="text/javascript">
+    
+    //used later when setting up the scene for the first time when loading
+    var startUp = true;  
+    
+   var labelsList = new Array();
+    labelsList[1] = '2(Feb7)_Master Greement.pdf';
+    labelsList[2] = '8_Credit Support Annex.pdf';
+    labelsList[3] = '3_2.pdf';
+    labelsList[4] = '2(Feb7).pdf';
+    labelsList[5] = '19.pdf';
+    labelsList[6] = '4_Master Agreement.pdf';
+    labelsList[7] = '5_Credit Support Annex.pdf';
+    labelsList[8] = '7.pdf';
+    labelsList[9] = '8_2.pdf';
+    labelsList[10] = '9_2.pdf';
+    labelsList[11] = '18.pdf';
+    labelsList[12] = '1_2.pdf';
+    labelsList[13] = '7_Master Agreement.pdf';
+    labelsList[14] = 'A_Amend1_Oct 2009.pdf';
+    labelsList[15] = 'B_Amend8_Mar 2015.pdf';
+    labelsList[16] = 'B_Amend7_Jun 2011.pdf';
+    labelsList[17] = 'A_Amend4 Feb 2016.pdf';
+    labelsList[18] = 'B_Amend2_July 2007.pdf';
+    labelsList[19] = 'B_Novation1_Jan 2002.pdf';
+    labelsList[20] = '1_1.pdf';
+    labelsList[21] = '5_Master Agreement.pdf';
+    labelsList[22] = '7_Credit Support Annex.pdf';
+    labelsList[23] = '6_Master Agreement.pdf';
+    labelsList[24] = '6_Credit Support Annex.pdf';
+    labelsList[25] = '9_Credit Support Annex.pdf';
+    labelsList[26] = '11.pdf';
+    labelsList[27] = '3(Feb7)_Master Agreement.pdf';
+    labelsList[28] = '3(Feb7)_Credit Support Annex.pdf';
+    labelsList[29] = '1.pdf';
+    labelsList[30] = '4_Credit Support Annex.pdf';
+    labelsList[31] = '2(Feb7)_Credit Support Annex.pdf';
+    labelsList[32] = '4.pdf';
+    labelsList[33] = '14.pdf';
+    labelsList[34] = '15.pdf';
+    labelsList[35] = '20.pdf';
+    labelsList[36] = 'B_Amend6_Jan 2011.pdf';
+    labelsList[37] = 'Self_Disclosure_Letter_Template_clean.pdf';
+    labelsList[38] = 'B_Amend5_Oct 2013.pdf';
+    labelsList[39] = 'B_Amend3_Aug 2012.pdf';
+    labelsList[40] = '9_Master Agreement.pdf';
+    labelsList[41] = 'B_Novation4_Mar 2013.pdf';
+    labelsList[42] = '13.pdf';
+    labelsList[43] = '3_1.pdf';
+    labelsList[44] = '2.pdf';
+    labelsList[45] = '5.pdf';
+    labelsList[46] = '10.pdf';
+    labelsList[47] = '8_1.pdf';
+    labelsList[48] = '6.pdf';
+    labelsList[49] = '12.pdf';
+    labelsList[50] = '17.pdf';
+    labelsList[51] = '3(Feb7).pdf';
+    labelsList[52] = '9_1.pdf';
+    labelsList[53] = '16.pdf';
+    labelsList[54] = 'A_MA.pdf';
+    labelsList[55] = '8_Master Agreement.pdf';
+    labelsList[56] = 'B_MA.pdf';
+    labelsList[57] = 'B_CSA_for_VM.pdf';
+    labelsList[58] = 'A_Amend2 Aug 2013.pdf';
+    labelsList[59] = 'A_Amend3 May 2011.pdf';
+    labelsList[60] = 'A_CSA.pdf';
+
+    
+    
+    // create an array with nodes
+    var nodes = new vis.DataSet([
+{id: 1, label: '2(Feb..', color: '#9ad4f7', group: 0},
+{id: 2, label: '8_Cre..', color: '#b0ccdd', group: 0},
+{id: 3, label: '3_2.p..', color: '#9ad4f7', group: 0},
+{id: 4, label: '2(Feb..', color: '#9ad4f7', group: 0},
+{id: 5, label: '19.pd..', color: '#9ad4f7', group: 0},
+{id: 6, label: '4_Mas..', color: '#9ad4f7', group: 0},
+{id: 7, label: '5_Cre..', color: '#b0ccdd', group: 0},
+{id: 8, label: '7.pdf..', color: '#9ad4f7', group: 0},
+{id: 9, label: '8_2.p..', color: '#9ad4f7', group: 0},
+{id: 10, label: '9_2.p..', color: '#9ad4f7', group: 0},
+{id: 11, label: '18.pd..', color: '#9ad4f7', group: 0},
+{id: 12, label: '1_2.p..', color: '#9ad4f7', group: 0},
+{id: 13, label: '7_Mas..', color: '#9ad4f7', group: 0},
+{id: 14, label: 'A_Ame..', color: '#e1eaef', group: 0},
+{id: 15, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 16, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 17, label: 'A_Ame..', color: '#e1eaef', group: 0},
+{id: 18, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 19, label: 'B_Nov..', color: '#e1eaef', group: 0},
+{id: 20, label: '1_1.p..', color: '#9ad4f7', group: 0},
+{id: 21, label: '5_Mas..', color: '#9ad4f7', group: 0},
+{id: 22, label: '7_Cre..', color: '#b0ccdd', group: 0},
+{id: 23, label: '6_Mas..', color: '#9ad4f7', group: 0},
+{id: 24, label: '6_Cre..', color: '#b0ccdd', group: 0},
+{id: 25, label: '9_Cre..', color: '#b0ccdd', group: 0},
+{id: 26, label: '11.pd..', color: '#9ad4f7', group: 0},
+{id: 27, label: '3(Feb..', color: '#9ad4f7', group: 0},
+{id: 28, label: '3(Feb..', color: '#b0ccdd', group: 0},
+{id: 29, label: '1.pdf..', color: '#9ad4f7', group: 0},
+{id: 30, label: '4_Cre..', color: '#b0ccdd', group: 0},
+{id: 31, label: '2(Feb..', color: '#b0ccdd', group: 0},
+{id: 32, label: '4.pdf..', color: '#9ad4f7', group: 0},
+{id: 33, label: '14.pd..', color: '#9ad4f7', group: 0},
+{id: 34, label: '15.pd..', color: '#9ad4f7', group: 0},
+{id: 35, label: '20.pd..', color: '#9ad4f7', group: 0},
+{id: 36, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 37, label: 'WGMR_..', color: '#e1eaef', group: 0},
+{id: 38, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 39, label: 'B_Ame..', color: '#e1eaef', group: 0},
+{id: 40, label: '9_Mas..', color: '#9ad4f7', group: 0},
+{id: 41, label: 'B_Nov..', color: '#e1eaef', group: 0},
+{id: 42, label: '13.pd..', color: '#9ad4f7', group: 0},
+{id: 43, label: '3_1.p..', color: '#9ad4f7', group: 0},
+{id: 44, label: '2.pdf..', color: '#9ad4f7', group: 0},
+{id: 45, label: '5.pdf..', color: '#9ad4f7', group: 0},
+{id: 46, label: '10.pd..', color: '#9ad4f7', group: 0},
+{id: 47, label: '8_1.p..', color: '#9ad4f7', group: 0},
+{id: 48, label: '6.pdf..', color: '#9ad4f7', group: 0},
+{id: 49, label: '12.pd..', color: '#9ad4f7', group: 0},
+{id: 50, label: '17.pd..', color: '#9ad4f7', group: 0},
+{id: 51, label: '3(Feb..', color: '#9ad4f7', group: 0},
+{id: 52, label: '9_1.p..', color: '#9ad4f7', group: 0},
+{id: 53, label: '16.pd..', color: '#9ad4f7', group: 0},
+{id: 54, label: 'A_MA...', color: '#9ad4f7', group: 0},
+{id: 55, label: '8_Mas..', color: '#9ad4f7', group: 0},
+{id: 56, label: 'B_MA...', color: '#9ad4f7', group: 0},
+{id: 57, label: 'B_CSA..', color: '#b0ccdd', group: 0},
+{id: 58, label: 'A_Ame..', color: '#e1eaef', group: 0},
+{id: 59, label: 'A_Ame..', color: '#e1eaef', group: 0},
+{id: 60, label: 'A_CSA..', color: '#b0ccdd', group: 0},
+
+{id: 101, size:80, label: 'No', color: '#b0ddb0', group: 1},
+{id: 102, size:80, label: 'Yes', color: '#b0ddb0',  group: 1},
+{id: 103, size:80, label: 'Yes, Tokyo,\nLondon, New York,\nHong Kong,..', color: '#b0ddb0',  group: 1},
+{id: 104, size:80, label: 'Yes: London,\nSingapore, Hong\nKong, Bangkok,..', color: '#b0ddb0',  group: 1},
+{id: 105, size:80, label: 'Yes: London,\nSingapore, Hong\nKong, Taipei,..', color: '#b0ddb0',  group: 1},
+{id: 106, size:80, label: 'Yes:\nNew York', color: '#b0ddb0',  group: 1},
+{id: 107, size:80, label: 'Yes:\nSingapore', color: '#b0ddb0',  group: 1},
+{id: 108, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore,..', color: '#b0ddb0',  group: 1},
+{id: 109, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore,..', color: '#b0ddb0',  group: 1},
+        
+{id: 201, size:80, label: 'No', color: '#85dd85', group: 2},
+{id: 202, size:80, label: 'Yes', color: '#85dd85', group: 2},
+{id: 203, size:80, label: 'Yes: New York,\nLondon, Singapore,\nHong Kong,..', color: '#85dd85', group: 2},
+{id: 204, size:80, label: 'Yes: New York,\nSingapore, Hong\nKong, Taipei', color: '#85dd85', group: 2},
+{id: 205, size:80, label: 'Yes: Singapore,\nHong Kong, Taipei', color: '#85dd85', group: 2},
+{id: 206, size:80, label: 'Yes: Tokyo,\nLondon', color: '#85dd85', group: 2},
+{id: 207, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore, Hong..', color: '#85dd85', group: 2},
+{id: 208, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore, Hong..', color: '#85dd85', group: 2},
+{id: 209, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore, Hong..', color: '#85dd85', group: 2},
+{id: 210, size:80, label: 'Yes: Tokyo,\nNew York, London,\nSingapore,..', color: '#85dd85', group: 2},
+        
+{id: 301, size:80, label: 'England', color: '#e6b1b1', group: 3},
+{id: 302, size:80, label: 'England and\nWales', color: '#e6b1b1', group: 3},
+{id: 303, size:80, label: 'India', color: '#e6b1b1', group: 3},
+{id: 304, size:80, label: 'State of\nNew York', color: '#e6b1b1', group: 3},
+
+{id: 401, size:80, label: 'Credit Support\nDefault', color: '#c3c3c3', group: 4},
+
+{id: 501, size:80, label: 'JPY', color: '#e4b6ea', group: 5},
+{id: 502, size:80, label: 'USD', color: '#e4b6ea', group: 5},
+
+{id: 601, size:80, label: 'JPY', color: '#e098ea', group: 6},
+{id: 602, size:80, label: 'USD', color: '#e098ea', group: 6},
+{id: 603, size:80, label: 'USD, JPY', color: '#e098ea', group: 6},
+
+{id: 701, size:80, label: 'DPB Bank, LTD.', color: '#dbe8a3', group: 7},
+{id: 702, size:80, label: 'The Green Bank,\nLimited', color: '#dbe8a3', group: 7},
+
+{id: 801, size:80, label: 'DPB Bank,\nLTD.', color: '#efda6b', group: 8},
+{id: 802, size:80, label: 'DPB \nBank, Ltd.', color: '#efda6b', group: 8},
+{id: 803, size:80, label: 'Barc,\nLimited', color: '#efda6b', group: 8},
+
+{id: 901, size:80, label: 'NO', color: '#9ce0bb', group: 9},
+{id: 902, size:80, label: 'YES', color: '#9ce0bb', group: 9}
+        
+        
+        
+    ]);
+    
+    // create an array with edges
+    var edges = new vis.DataSet([
+        {from: 103, to: 1},
+{from: 101, to: 3, arrows:{from:{scaleFactor:0.3}}}, //, arrows:'from'
+{from: 109, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 6, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 12, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 13, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 107, to: 21, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 23, arrows:{from:{scaleFactor:0.3}}},
+{from: 106, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 27, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 107, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 47, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 109, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 52, arrows:{from:{scaleFactor:0.3}}},
+{from: 102, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 55, arrows:{from:{scaleFactor:0.3}}},
+{from: 101, to: 56, arrows:{from:{scaleFactor:0.3}}},
+{from: 104, to: 58, arrows:{from:{scaleFactor:0.3}}},
+        
+{from: 201, to: 1, arrows:{from:{scaleFactor:0.3}}},
+{from: 207, to: 3, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 204, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 203, to: 6, arrows:{from:{scaleFactor:0.3}}},
+{from: 209, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 202, to: 12, arrows:{from:{scaleFactor:0.3}}},
+{from: 209, to: 13, arrows:{from:{scaleFactor:0.3}}},
+{from: 202, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 21, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 23, arrows:{from:{scaleFactor:0.3}}},
+{from: 209, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 27, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 203, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 205, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 202, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 207, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 210, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 47, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 52, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 209, to: 54, arrows:{from:{scaleFactor:0.3}}},
+{from: 201, to: 55, arrows:{from:{scaleFactor:0.3}}},
+{from: 206, to: 56, arrows:{from:{scaleFactor:0.3}}},
+{from: 208, to: 58, arrows:{from:{scaleFactor:0.3}}},
+{from: 209, to: 59, arrows:{from:{scaleFactor:0.3}}},
+        
+{from: 301, to: 1, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 12, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 13, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 21, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 3, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 47, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 52, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 55, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 58, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 59, arrows:{from:{scaleFactor:0.3}}},
+{from: 301, to: 6, arrows:{from:{scaleFactor:0.3}}},
+{from: 302, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 302, to: 54, arrows:{from:{scaleFactor:0.3}}},
+{from: 303, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 303, to: 56, arrows:{from:{scaleFactor:0.3}}},
+{from: 303, to: 57, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 23, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 27, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 304, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 22, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 24, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 28, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 30, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 31, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 60, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 7, arrows:{from:{scaleFactor:0.3}}},
+{from: 401, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 501, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 501, to: 57, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 10, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 2, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 24, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 25, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 28, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 30, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 31, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 60, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 7, arrows:{from:{scaleFactor:0.3}}},
+{from: 502, to: 9, arrows:{from:{scaleFactor:0.3}}},
+{from: 601, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 601, to: 57, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 10, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 2, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 25, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 30, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 31, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 54, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 59, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 60, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 7, arrows:{from:{scaleFactor:0.3}}},
+{from: 602, to: 9, arrows:{from:{scaleFactor:0.3}}},
+{from: 603, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 10, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 2, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 21, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 25, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 27, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 28, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 30, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 31, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 47, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 52, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 55, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 6, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 7, arrows:{from:{scaleFactor:0.3}}},
+{from: 701, to: 9, arrows:{from:{scaleFactor:0.3}}},
+{from: 702, to: 3, arrows:{from:{scaleFactor:0.3}}},
+{from: 702, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 13, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 22, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 44, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 54, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 56, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 57, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 58, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 59, arrows:{from:{scaleFactor:0.3}}},
+{from: 801, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 802, to: 60, arrows:{from:{scaleFactor:0.3}}},
+{from: 803, to: 12, arrows:{from:{scaleFactor:0.3}}},
+{from: 803, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 1, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 10, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 11, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 12, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 13, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 2, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 21, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 22, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 23, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 24, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 25, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 26, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 27, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 28, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 29, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 3, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 30, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 31, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 32, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 33, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 34, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 35, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 40, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 4, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 42, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 45, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 46, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 47, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 48, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 49, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 5, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 50, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 51, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 52, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 53, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 54, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 55, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 56, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 57, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 58, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 59, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 6, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 60, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 7, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 8, arrows:{from:{scaleFactor:0.3}}},
+{from: 901, to: 9, arrows:{from:{scaleFactor:0.3}}},
+{from: 902, to: 20, arrows:{from:{scaleFactor:0.3}}},
+{from: 902, to: 43, arrows:{from:{scaleFactor:0.3}}},
+{from: 902, to: 44, arrows:{from:{scaleFactor:0.3}}},
+        
+        
+{from: 36, to: 40, arrows:{to:{scaleFactor:0.3}}},
+{from: 37, to: 40, arrows:{to:{scaleFactor:0.3}}},
+{from: 38, to: 40, arrows:{to:{scaleFactor:0.3}}},
+{from: 39, to: 40, arrows:{to:{scaleFactor:0.3}}},
+{from: 41, to: 40, arrows:{to:{scaleFactor:0.3}}},
+{from: 19, to: 13, arrows:{to:{scaleFactor:0.3}}},
+{from: 14, to: 13, arrows:{to:{scaleFactor:0.3}}},
+{from: 15, to: 13, arrows:{to:{scaleFactor:0.3}}},
+{from: 16, to: 13, arrows:{to:{scaleFactor:0.3}}},
+{from: 17, to: 13, arrows:{to:{scaleFactor:0.3}}} ,
+{from: 18, to: 13, arrows:{to:{scaleFactor:0.3}}}           
+       
+        
+    ]);
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+
+    // provide the data in the vis format
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        autoResize: true,
+        height: '100%',
+        width: '100%',
+        interaction: {hover: true},
+        nodes: {
+            shape: 'dot',
+            size: 45,
+            font: {
+                size: 20,
+                color: 'rgba(255, 255, 255, 0)'
+            },
+            borderWidth: 1
+        },
+        edges: {
+            width: 3,
+            length: 100
+        }
+        
+    };
+
+    // initialize your network!
+    var network = new vis.Network(container, data, options);
+    
+    
+     network.on("initRedraw", function () {
+    // do something like move some custom elements?
+  });
+  network.on("afterDrawing", function (ctx) {
+    
+	ctx.fillStyle = "black";
+	ctx.textAlign = "center";
+    ctx.size = 50;
+    var allNodes = nodes.get({returnType:"Object"});
+      
+    for (var nodeId in allNodes) {
+    //var nodeId = 2;
+    var nodePosition = network.getPositions([nodeId]);
+    
+        
+    var textvalArr = allNodes[nodeId].label.split("\n");
+    var linespacing=24;
+    if (textvalArr.length>1){ //only if linebreaks exists
+    var width = ctx.measureText(textvalArr[0]).width;
+    for ( var i = 0; i < textvalArr.length; i++) {
+
+    ctx.fillText(textvalArr[i],nodePosition[nodeId].x/*+width/2*/, 
+                 (nodePosition[nodeId].y - 5 + i * linespacing - (textvalArr.length - 1)/2 * linespacing ));
+    top += linespacing;
+    }
+    }else{
+    ctx.fillText(allNodes[nodeId].label, nodePosition[nodeId].x, nodePosition[nodeId].y-5);   // default
+    }    
+    
+        
+    //ctx.fillText(allNodes[nodeId].label, nodePosition[nodeId].x, nodePosition[nodeId].y-5);
+    //allNodes[2].fillText(allNodes[nodeId].label, nodePosition[nodeId].x, nodePosition[nodeId].y-5);  
+    
+    }
+      
+    //  alert(this.body.nodes[nodeId].x);
+        //alert(node.label);
+    //for (var node in this.body.nodes) {
+    //}        
+    /*var allNodes;
+    var nodesDataset = new vis.DataSet(nodes);
+    allNodes = nodesDataset.get({returnType:"Object"});
+    for (var nodeId in allNodes) {
+        alert(nodeId);
+                }*/
+      
+    if (startUp) {  
+        removeKPI(1);
+        removeKPI(2);
+        removeKPI(3);
+        removeKPI(4);
+        removeKPI(5);
+        removeKPI(6);
+        removeKPI(9);
+        startUp = false;
+    }
+      
+  });
+    
+  network.on("click", function (params) {
+    if ($("#labelText").text() == labelsList[params.nodes]) {
+        $("#labelText").text("");
+      } else {
+          $("#labelText").text(labelsList[params.nodes]);
+      }
+     
+      
+    var nodeID = params['nodes']['0'];
+     var index = anchoredKPI.indexOf(nodeID);
+     if (nodeID && (index > -1)) {
+        var clickedNode = nodes.get(nodeID);
+        clickedNode.fixed = {
+          x:false,
+          y:false
+        }
+          nodes.update(clickedNode);
+          if (index > -1) {
+            anchoredKPI.splice(index, 1);
+          }
+    }
+            /*{
+          border: '#6a6a6a',
+          background: clickedNode.color,
+          highlight: {
+            border: '#646464',
+            background: clickedNode.color
+          }
+        }*/  
+      
+      
+      
+    });    
+    
+ // initialize a list of anchored nodes
+ var anchoredKPI = []
+    
+ network.on("dragEnd", function (params) {
+      //var allNodes = nodes.get({returnType:"Object"});
+      var nodeID = params['nodes']['0'];
+      var index = anchoredKPI.indexOf(nodeID);
+      if (nodeID && !(index > -1)) {
+        var clickedNode = nodes.get(nodeID);
+        clickedNode.fixed = {
+          x:true,
+          y:true
+        }
+          nodes.update(clickedNode);
+          anchoredKPI.push(nodeID);
+
+    }
+ });
+     
+ 
+    
+ var nodesToAdd = new vis.DataSet([]);    
+ var backupTable = [];    
+    
+ function kpiClick(groupId, element) {
+    if ($(element).hasClass("active")) {
+       $(element).removeClass("active");
+       removeKPI(groupId);
+    } else {
+       $(element).addClass("active");
+       addKPI(groupId);
+    }
+    
+ }    
+    
+ function removeKPI(groupId) {
+     
+     /*var arrayLength = anchoredKPI.length;
+for (var i = 0; i < arrayLength; i++) {
+    alert(anchoredKPI[i]);}*/
+     
+      var allNodes = nodes.get({returnType:"Object"});
+        for (var nodeId in allNodes) {
+            //alert(typeof anchoredKPI[0]);
+            if ((allNodes[nodeId].group == groupId) && 
+                (jQuery.inArray(Number(nodeId), anchoredKPI) == -1)) {
+            backupTable.push(nodes.get(nodeId));
+            nodes.remove({id:nodeId});}
+            //var index = nodeIds.indexOf(nodeId);
+            //nodeIds.splice(index,1);
+        }
+
+    }
+    
+ function addKPI(groupId) {
+      //var allNodesAdd = nodesBackup.get({returnType:"Object"});     
+        for (var nodeId in backupTable) {
+          if ((backupTable[nodeId].group == groupId) && (!(anchoredKPI.indexOf(nodeId) > -1))) {
+                nodes.add([
+                {id: backupTable[nodeId].id, 
+                 size:80, 
+                 label: backupTable[nodeId].label, 
+                 color: backupTable[nodeId].color, 
+                 group: groupId}
+                ]);
+              delete backupTable[nodeId];
+            }
+        }
+
+    }    
+    
+    
+function tagClick(groupId, element) {
+    if ($(element).hasClass("active2")) {
+       $(element).removeClass("active2");
+       removeTag(groupId);
+    } else {
+       $(element).addClass("active2");
+       addTag(groupId);
+    }
+    
+ }    
+    
+ function removeTag(groupId) {
+     
+      var allNodes = nodes.get({returnType:"Object"});
+        for (var nodeId in allNodes) {
+            if ((allNodes[nodeId].color == groupId) && 
+                (jQuery.inArray(Number(nodeId), anchoredKPI) == -1)) {
+            backupTable.push(nodes.get(nodeId));
+            nodes.remove({id:nodeId});}
+        }
+
+    }
+    
+ function addTag(groupId) {
+        for (var nodeId in backupTable) {
+          if ((backupTable[nodeId].color == groupId) && (!(anchoredKPI.indexOf(nodeId) > -1))) {
+                nodes.add([
+                {id: backupTable[nodeId].id, 
+                 size:40, 
+                 label: backupTable[nodeId].label, 
+                 color: backupTable[nodeId].color, 
+                 group: groupId}
+                ]);
+              delete backupTable[nodeId];
+            }
+        }
+
+    }        
+    
+    
+</script>
+</body>
+</html>
