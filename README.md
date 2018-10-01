@@ -3,9 +3,6 @@
 ### graph-viz
 A quick test of a Viz visualisation library. It's purpose was to establish if displaying document data in graph structures can be used in front end. To run, open `index.html` in browser.
 
-### stansa-app
-Application written in NodeJs and Electron. It's purpose is to perform version control operations an online SVN repository (similar to GitHub). The application can be called from a web browser. This way, commands like `add`, `commit`, `push`, `pull` can be run from a web-page without command line. To run you have to compile and build using npm.
-
 ### tables
 Experiments on data extraction from PDFs containing tables of numerical data. Using a number of different techniques to clean up the data.
 - `analyseTable.py` - extract data from a specific area of a specific page
